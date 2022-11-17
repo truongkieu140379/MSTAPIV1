@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MSTAPIV1.Dtos;
 using MSTAPIV1.Entity;
+using MSTAPIV1.Services.UserService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -15,10 +17,25 @@ namespace MSTAPIV1.Controllers
     {
         public static User user =new User();
         private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration, IUserService userService)
         {
             _configuration = configuration;
+            _userService = userService;
+        }
+
+        [HttpGet, Authorize]
+        public ActionResult<object> GetMe()
+        {
+            var userName= _userService.GetMyName();
+            return Ok(userName);
+            //var username = user?.identity?.name;
+            //var username2 = user.findfirstvalue(claimtypes.name);
+            //var role = user.findfirstvalue(claimtypes.role);
+
+            //return ok(new{username, username2, role});
+
         }
 
         [HttpPost("register")]
@@ -50,7 +67,8 @@ namespace MSTAPIV1.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name,user.Username)
+                new Claim(ClaimTypes.Name,user.Username),
+                new Claim(ClaimTypes.Role,"Noob")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
