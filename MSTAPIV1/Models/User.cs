@@ -23,10 +23,10 @@ namespace MSTAPIV1.Models
         public string Username { get; set; }
         
         public string Password { get; set; }
-        [Required]
+       
        
         public string PasswordHash { get; set; }
-        [Required]
+        
         
         public string PasswordSalt { get; set; }
         
